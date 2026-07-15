@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: python-flask-app
+  name: python-flask-app
+  namespace: python-flask-app
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: python-flask-app
+status:
+  loadBalancer: {}

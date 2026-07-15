@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: python-flask-app
+  name: python-flask-app
+  namespace: python-flask-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-flask-app
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: python-flask-app
+    spec:
+      imagePullSecrets:
+      - name: dockerhub-cred
+      containers:
+      - image: kumar2021/python-flask-app:v1
+        name: python-flask-app
+        resources: {}
+        ports:
+        - containerPort: 5000
+status: {}
