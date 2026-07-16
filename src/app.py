@@ -11,7 +11,7 @@ def root():
 @app.route("/app/v1/info")
 def details():
     return jsonify({
-        "message": "You've developed and deployed this Python Flask App, little human !! <3",
+        "message": "You've developed and deployed this Python Flask App, little human !!",
         "hostname": socket.gethostname(),
         "time": datetime.datetime.now().strftime("%I:%M:%S%p on %B %d %Y"),
         "deployed_on": "kubernetes"
