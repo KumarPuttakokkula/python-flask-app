@@ -1,4 +1,4 @@
-name: CIPipeline
+name: CICDPipeline
 
 on:
   push:
@@ -8,10 +8,13 @@ on:
       - '**'
     tags:
       - 'v*' # Triggers on every version tag push (e.g., v1.0.0)
+  pull_request:
+    branches:
+      - 'main'
 
 jobs:
-  docker:
-    runs-on: [self-hosted, linux, ARM64]
+  ci:
+    runs-on: ubuntu-latest
     steps:
       -
         name: Login to Docker Hub
@@ -27,10 +30,64 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
+      
+      - name: Extract Docker metadata (Tags & Labels)
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.APP_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=sha,format=short
       -
         name: Build and push
         uses: docker/build-push-action@v7
         with:
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/python-flask-app:${{ env.COMMIT_ID }}
-            
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+  
+  cd:
+    needs: ci
+    runs-on: [self-hosted, linux, ARM64]
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v7
+      -
+        name: Install YT and Modify values file
+        shell: bash
+        id: modify
+        run: |
+          echo "Image with tags: ${{ needs.ci.outputs.image_tag }}"
+          # Example pulling the first/primary tag for a deployment script
+          IMAGE_TAG=$(echo "${{ needs.ci.outputs.image_tag }}" | head -n 1)
+          echo "Deployment tag is: $IMAGE_TAG"
+          pip install yq
+          yq -i '.image.tag = $IMAGE_TAG' charts/${{ vars.APP_NAME }}/values.yaml
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+          
+      - name: Commit and Push Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Updated values.yaml file with image tag: ${{ steps.modify.outputs.image_tag }}"
+      -
+        name: Install ArgoCD
+        shell: bash
+        run: |
+          curl -ksSL -o argocd https://arogcd-server.argocd.svc.cluster.local/download/argocd-linux-arm64
+          chmod +x argocd
+          sudo mv ./argocd /usr/local/bin/argocd
+      -
+        name: ArgoCD Sync App
+        shell: bash
+        run: |
+          argocd login argocd-server.argocd.svc.cluster.local \
+          --insecure \
+          --grpc-web \
+          --username ${{ secrets.ARGOCD_USERNAME }}
+          --password ${{ secrets.ARGOCD_PASSWORD }}
+          argocd app sync ${{ vars.APP_NAME }}
