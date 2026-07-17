@@ -14,7 +14,7 @@ def details():
         "message": "You've developed and deployed this Python Flask App from ArgoCD !!, little human !!",
         "hostname": socket.gethostname(),
         "time": datetime.datetime.now().strftime("%I:%M:%S%p on %B %d %Y"),
-        "deployed_on": "kubernetes"
+        "deployed_on": "Kubernetes"
     })
 
 @app.route("/app/v1/healthz")
