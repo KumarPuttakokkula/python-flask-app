@@ -49,7 +49,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
     outputs:
-      image_tag: ${{ steps.meta.outputs.tags }}
+      image_tags: ${{ steps.meta.outputs.tags }}
   
   cd:
     needs: ci
@@ -62,13 +62,12 @@ jobs:
         shell: bash
         id: modify
         run: |
-          echo "Image with tags: ${{ needs.ci.outputs.image_tag }}"
+          echo "Image with tags: ${{ needs.ci.outputs.image_tags }}"
           # Example pulling the first/primary tag for a deployment script
-          IMAGE_TAG=$(echo "${{ needs.ci.outputs.image_tag }}" | head -n 1)
-          echo "Deployment tag is: $IMAGE_TAG"
-          pip install yq
-          yq -i '.image.tag = $IMAGE_TAG' charts/${{ vars.APP_NAME }}/values.yaml
-          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+          NEW_TAG=$(echo "${{ needs.ci.outputs.image_tags }}" | head -n 1)
+          echo "Deployment tag is: $NEW_TAG"
+          sed -i "s/\(image:.*:\).*/\1${NEW_TAG}/" charts/${{ vars.APP_NAME }}/values.yaml
+          echo "image_tag=$NEW_TAG" >> "$GITHUB_OUTPUT"
           
       - name: Commit and Push Changes
         uses: stefanzweifel/git-auto-commit-action@v5
