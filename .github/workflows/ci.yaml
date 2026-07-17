@@ -1,13 +1,13 @@
-name: CI-Pipeline
+name: CIPipeline
 
 on:
-	push:
-		paths:
-			- src/**
-		branches:
-			- '**'
-		tags:
-			- 'v*' # Triggers on every version tag push (e.g., v1.0.0)
+  push:
+    paths:
+      - src/**
+    branches:
+      - '**'
+    tags:
+      - 'v*' # Triggers on every version tag push (e.g., v1.0.0)
 
 jobs:
   docker:
@@ -19,11 +19,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-			-
-				name: Shorten Commit Id
-				shell: bash
-				run: |
-					echo "COMMIT_ID=${GITHUB_SHA::6}" >> "$GITHUB_ENV"
+      -
+        name: Shorten Commit Id
+        shell: bash
+        run: |
+          echo "COMMIT_ID=${GITHUB_SHA::6}" >> "$GITHUB_ENV"
       -
         name: Build and push
         uses: docker/build-push-action@v7
