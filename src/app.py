@@ -11,10 +11,11 @@ def root():
 @app.route("/app/v1/info")
 def details():
     return jsonify({
-        "message": "You've developed and deployed this Python Flask App from ArgoCD !!, little human !!",
+        "message": "You've developed and deployed this Python Flask App from ArgoCD !!",
         "hostname": socket.gethostname(),
         "time": datetime.datetime.now().strftime("%I:%M:%S%p on %B %d %Y"),
         "deployed_on": "Kubernetes"
+        "deployed_by": "Kumar Puttakokkula"
     })
 
 @app.route("/app/v1/healthz")
