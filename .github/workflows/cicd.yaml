@@ -54,6 +54,7 @@ jobs:
           NEW_TAG=${{ needs.ci.outputs.commit_id }}
           echo "Deployment tag is: $NEW_TAG"
           sed -i "s/\(image:.*:\).*/\1${NEW_TAG}/" charts/${{ vars.APP_NAME }}/values.yaml
+          cat charts/${{ vars.APP_NAME }}/values.yaml
           
       - name: Commit and Push Changes
         uses: stefanzweifel/git-auto-commit-action@v5
