@@ -54,7 +54,7 @@ jobs:
           NEW_TAG=${{ needs.ci.outputs.commit_id }}
           echo "Deployment tag is: $NEW_TAG"
           sudo apt update
-          sudo apt install yq
+          sudo apt install -y yq
           yq -Yi '.image.tag = "${{needs.ci.outputs.commit_id}}"' charts/${{ vars.APP_NAME }}/values.yaml
           cat charts/${{ vars.APP_NAME }}/values.yaml
           
