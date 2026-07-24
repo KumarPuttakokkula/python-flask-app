@@ -2,7 +2,7 @@ replicaCount: 1
 image:
   repository: kumar2021/python-flask-app
   pullPolicy: Always
-  tag: "f71335"
+  tag: "c48f64"
 imagePullSecrets:
   - name: dockerhub-cred
 nameOverride: ""
