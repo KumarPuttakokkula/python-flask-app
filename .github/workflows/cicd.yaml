@@ -35,7 +35,9 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v7
         with:
+          context: .
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ vars.APP_NAME }}:${{ env.COMMIT_ID }}
     outputs:
       commit_id: ${{ env.COMMIT_ID }}
