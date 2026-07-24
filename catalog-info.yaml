@@ -1,0 +1,8 @@
+ apiVersion: backstage.io/v1alpha1
+ kind: Component
+ metadata:
+   name: Python-Flask-App
+ spec:
+   type: service
+   owner: group:development
+   lifecycle: experimental
