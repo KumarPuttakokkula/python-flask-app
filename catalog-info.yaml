@@ -2,6 +2,9 @@
  kind: Component
  metadata:
    name: Python-Flask-App
+   description: Python app that displays Info and Health.
+   annotations:
+    backstage.io/techdocs-ref: dir:.
  spec:
    type: service
    owner: group:development
